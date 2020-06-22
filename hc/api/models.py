@@ -9,7 +9,6 @@ from croniter import croniter
 from django.conf import settings
 from django.core.signing import TimestampSigner
 from django.db import models
-from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
 from hc.accounts.models import Project
