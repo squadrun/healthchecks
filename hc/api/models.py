@@ -768,19 +768,6 @@ class Flip(models.Model):
             )
         ]
 
-    def x(cls):
-        check_to_latest_flip_id_map = cls.objects.values('owner_id').order_by('id').annotate(latest_flip=Max('id'))
-        flip_id_to_obj_map = cls.objects.filter(id__in=check_to_latest_flip_id_map.values()).in_bulk()
-
-        for flip_id, flip_obj in flip_id_to_obj_map.items():
-            if flip_obj.new_status == "down":
-                if flip_obj.processed <= flip_obj.check.timeout + flip_obj.check.grace:
-                    pass
-
-                pass
-            else:
-                pass
-
     def to_dict(self):
         return {
             "timestamp": isostring(self.created),

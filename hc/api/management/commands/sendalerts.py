@@ -99,7 +99,7 @@ class Command(BaseCommand):
             return False
 
         q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now())
-        num_updated = q.updated(next_alert_at=F('next_alert_at') + flip.check.timeout)
+        num_updated = q.update(next_alert_at=F('next_alert_at') + flip.check.timeout)
         if num_updated != 1:
             return True
         _notify(flip)
