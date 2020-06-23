@@ -94,11 +94,11 @@ class Command(BaseCommand):
         ####
         # This is custom code for Squad following the above practices, since don't want to change logic much
         # ####
-        flip = Flip.objects.filter(next_alert_at__lte=timezone.now()).order_by("id").first()
+        flip = Flip.objects.filter(next_alert_at__lte=timezone.now(), new_status="down").order_by("id").first()
         if flip is None:
             return False
 
-        q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now())
+        q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now(), new_status="down")
         num_updated = q.update(next_alert_at=F('next_alert_at') + flip.check.timeout)
         if num_updated != 1:
             return True
