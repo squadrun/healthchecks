@@ -79,7 +79,9 @@ class Command(BaseCommand):
         ####
         # This is custom code for Squad following the below practices, since don't want to change logic much
         # ####
-        flip = Flip.objects.filter(next_alert_at__lte=timezone.now(), new_status="down").order_by("id").first()
+        flip = Flip.objects.filter(
+            next_alert_at__lte=timezone.now(), new_status="down", owner__status__in=("up", "down")
+        ).order_by("id").first()
         if flip is not None:
             q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now(), new_status="down")
             num_updated = q.update(next_alert_at=F('next_alert_at') + flip.owner.timeout)
