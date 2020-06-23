@@ -1,7 +1,7 @@
 from datetime import timedelta as td
 import time
 import requests
-from django.db.models import F
+from django.db.models import F, Max
 from threading import Thread
 
 from django.core.management.base import BaseCommand
@@ -79,12 +79,17 @@ class Command(BaseCommand):
         ####
         # This is custom code for Squad following the below practices, since don't want to change logic much
         # ####
+        latest_flips_list = Flip.objects.values('owner_id').annotate(latest_flip_id=Max('id')).values(
+            'owner_id', 'latest_flip_id'
+        )
+
         flip = Flip.objects.filter(
-            next_alert_at__lte=timezone.now(), new_status="down", owner__status__in=("up", "down")
+            next_alert_at__lte=timezone.now(), new_status="down", owner__status__in=("up", "down"),
+            id__in=[f['latest_flip_id'] for f in latest_flips_list]
         ).order_by("id").first()
         if flip is not None:
             q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now(), new_status="down")
-            num_updated = q.update(next_alert_at=F('next_alert_at') + flip.owner.timeout)
+            num_updated = q.update(next_alert_at=F('next_alert_at') + flip.owner.timeout + flip.owner.grace)
             if num_updated != 1:
                 return True
 
