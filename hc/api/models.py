@@ -749,6 +749,13 @@ class Flip(models.Model):
     old_status = models.CharField(max_length=8, choices=STATUSES)
     new_status = models.CharField(max_length=8, choices=STATUSES)
 
+    next_alert_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Denotes the time next alerts should be sent in case this "
+                  "flip does not come back to success from failure",
+        db_index=True
+    )
+
     class Meta:
         indexes = [
             # For quickly looking up unprocessed flips.
