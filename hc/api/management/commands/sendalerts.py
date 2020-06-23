@@ -76,6 +76,18 @@ class Command(BaseCommand):
             else:
                 notify(_flip.id, self.stdout)
 
+        ####
+        # This is custom code for Squad following the below practices, since don't want to change logic much
+        # ####
+        flip = Flip.objects.filter(next_alert_at__lte=timezone.now(), new_status="down").order_by("id").first()
+        if flip is not None:
+            q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now(), new_status="down")
+            num_updated = q.update(next_alert_at=F('next_alert_at') + flip.check.timeout)
+            if num_updated != 1:
+                return True
+
+            _notify(flip)
+
         """ Find unprocessed flip, send notifications.  """
 
         # Order by processed, otherwise Django will automatically order by id
@@ -91,18 +103,6 @@ class Command(BaseCommand):
             return True
         _notify(flip)
 
-        ####
-        # This is custom code for Squad following the above practices, since don't want to change logic much
-        # ####
-        flip = Flip.objects.filter(next_alert_at__lte=timezone.now(), new_status="down").order_by("id").first()
-        if flip is None:
-            return False
-
-        q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now(), new_status="down")
-        num_updated = q.update(next_alert_at=F('next_alert_at') + flip.check.timeout)
-        if num_updated != 1:
-            return True
-        _notify(flip)
 
         return True
 
