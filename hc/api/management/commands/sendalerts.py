@@ -86,7 +86,7 @@ class Command(BaseCommand):
         flip = Flip.objects.filter(
             next_alert_at__lte=timezone.now(), new_status="down", owner__status__in=("up", "down"),
             id__in=[f['latest_flip_id'] for f in latest_flips_list]
-        ).values().order_by("id").first()
+        ).order_by("id").first()
         if flip is not None:
             q = Flip.objects.filter(id=flip.id, next_alert_at__lte=timezone.now(), new_status="down")
             num_updated = q.update(next_alert_at=F('next_alert_at') + flip.owner.timeout + flip.owner.grace)
