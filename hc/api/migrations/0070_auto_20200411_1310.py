@@ -41,4 +41,14 @@ class Migration(migrations.Migration):
                 max_length=20,
             ),
         ),
+        migrations.AddField(
+            model_name='flip',
+            name='next_alert_at',
+            field=models.DateTimeField(
+                blank=True,
+                db_index=True,
+                help_text='Denotes the time next alerts should be sent in case this flip does not come back to success from failure',
+                null=True
+            ),
+        ),
     ]
